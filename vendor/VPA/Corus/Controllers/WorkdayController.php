@@ -39,6 +39,13 @@ class WorkdayController extends \VPA\Controller
 	$profileID = $uri_data[1][0];
 	$modelWorkday = new \VPA\Corus\Models\Workday();
 	$status = $modelWorkday->endWorkday($profileID);
+
+	// Если рабочий день закрывается, но при этом имеется активная пауза
+	// то мы ее закрываем вместе с рабочим днем.
+	$workdayID = $modelWorkday->getCurrentWorkday($profileID);
+	$modelPause = new \VPA\Corus\Models\WorkdayPause();
+	$status = $modelPause->endPause($workdayID);
+	
 	$data = ['status'=>$status ? 'ok' : 'error'];
 	$view = new \VPA\Views\JSON($config);
 	$template = $view->render($data);
